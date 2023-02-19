@@ -11,6 +11,7 @@ const service = axios.create({
 })
 
 // request interceptor
+// 请求拦截器，携带token字段
 service.interceptors.request.use(
   config => {
     // do something before request is sent
@@ -19,7 +20,7 @@ service.interceptors.request.use(
       // let each request carry token
       // ['X-Token'] is a custom headers key
       // please modify it according to the actual situation
-      config.headers['X-Token'] = getToken()
+      config.headers['token'] = getToken()
     }
     return config
   },
@@ -30,6 +31,7 @@ service.interceptors.request.use(
   }
 )
 
+// 响应拦截器
 // response interceptor
 service.interceptors.response.use(
   /**
@@ -46,7 +48,8 @@ service.interceptors.response.use(
     const res = response.data
 
     // if the custom code is not 20000, it is judged as an error.
-    if (res.code !== 20000) {
+    // 服务器响应失败情况
+    if (res.code !== 20000 && res.code !== 200) {
       Message({
         message: res.message || 'Error',
         type: 'error',
@@ -68,6 +71,7 @@ service.interceptors.response.use(
       }
       return Promise.reject(new Error(res.message || 'Error'))
     } else {
+      // 服务器响应成功情况
       return res
     }
   },
